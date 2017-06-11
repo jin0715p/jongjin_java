@@ -1,0 +1,97 @@
+package lasvegas;
+import javax.swing.*;import java.awt.*;import java.awt.event.ActionEvent;import java.awt.event.ActionListener;import java.awt.event.KeyEvent;import java.awt.event.KeyListener;import java.io.IOException;import java.io.InputStreamReader;import java.io.OutputStreamWriter;import java.io.PrintWriter;import java.net.InetAddress;import java.net.Socket;import java.util.Scanner;
+public class Start_2 extends JFrame {
+ private Scanner receiver; private PrintWriter sender; private Scanner console; JTextArea text3_; String command; String line; JTextArea text0,text1,text2,text3,text4,text5,text6;     //text0  이름 얻는 변수 JTextArea lastgetmoney_; JTextArea lastranking_; JButton Button[] = new JButton[9]; JTextField getname; // 순서 이름 받는변수 int[] dicenum = new int[6]; //눈금당 주사위의 개수 int[] final_dicenum = new int[6]; String[] tokens1; JTextArea text0_1; JTextArea text0_2; JTextArea text0_3;
+ 
+ public Start_2(String serverIP, int port){
+  createGUI();  connectToServer(serverIP, port);  startGame(); }
+ void createGUI(){
+  setTitle("LasvegasGame");    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+  Container contentPane = getContentPane();  // 콘테이너 색  contentPane.setBackground(Color.CYAN);  contentPane.setLayout(new FlowLayout());  contentPane.setLayout(new FlowLayout(FlowLayout.LEFT)); //일방향으로 여러 개 배치
+  Button[6] = new JButton("바로시작");      //Start 버튼 Button[6]  add(Button[6]);  Button[7] = new JButton("주사위던지기");   //roll 버튼 Button[7]  add(Button[7]);  Button[8] = new JButton("끝내기");       //end 버튼 Button[8]  add(Button[8]);  Button[0] = new JButton("1");  add(Button[0]);  Button[1] = new JButton("2");  add(Button[1]);  Button[2] = new JButton("3");  add(Button[2]);  Button[3] = new JButton("4");  add(Button[3]);  Button[4] = new JButton("5");  add(Button[4]);  Button[5] = new JButton("6");  add(Button[5]);
+  for(int i=0; i<9; i++) {   btnDeAct(i);  }  btnAct(8);    // END
+  JLabel label = new JLabel("'나'에 이름을 입력하면 시작! ");  add(label);  JLabel label0 = new JLabel("나");  text0 = new JTextArea("",1,14);    //text0  이름 얻는 변수  text0.setBackground(Color.YELLOW);  JLabel label0_1 = new JLabel("유저2");  text0_1 = new JTextArea("",1,14);  text0_1.setBackground(Color.BLUE);  JLabel label0_2 = new JLabel("유저3");  text0_2 = new JTextArea("",1,14);  text0_2.setBackground(Color.GREEN);  JLabel label0_3 = new JLabel("유저4");  text0_3 = new JTextArea("",1,14);  text0_3.setBackground(Color.RED);
+  JPanel panel = new JPanel();    panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS)); // 기본 가로패널.
+  panel.add(label0);  panel.add(text0);  panel.add(label0_1);  panel.add(text0_1);  panel.add(label0_2);  panel.add(text0_2);  panel.add(label0_3);  panel.add(text0_3);
+  JPanel panel2 = new JPanel();  panel2.setLayout(new BoxLayout(panel2, BoxLayout.X_AXIS)); // 기본 가로패널.        
+  JLabel label1 = new JLabel("지옥");  text1 = new JTextArea("",10,9);     JLabel label2 = new JLabel("서울");  text2 = new JTextArea("",10,9);  JLabel label3 = new JLabel("대전");  text3 = new JTextArea("",10,8);  JLabel label4 = new JLabel("부산");  text4 = new JTextArea("",10,8);  JLabel label5 = new JLabel("대구");  text5 = new JTextArea("",10,9);  JLabel label6 = new JLabel("천국");  text6 = new JTextArea("",10,9);
+  panel2.add(label1);  panel2.add(text1);  panel2.add(label2);  panel2.add(text2);  panel2.add(label3);  panel2.add(text3);  panel2.add(label4);  panel2.add(text4);  panel2.add(label5);  panel2.add(text5);  panel2.add(label6);  panel2.add(text6);
+  JPanel panel4 = new JPanel();  panel4.setLayout(new BoxLayout(panel4, BoxLayout.X_AXIS)); // 기본 가로패널
+  JLabel lastgetmoney = new JLabel("딴돈");  lastgetmoney_ = new JTextArea("",5,29);     JLabel lastranking = new JLabel("최종순위");  lastranking_ = new JTextArea("",5,30);
+  panel4.add(lastgetmoney);  panel4.add(lastgetmoney_);  panel4.add(lastranking);  panel4.add(lastranking_);
+
+  JPanel panel3 = new JPanel();  panel3.setLayout(new BoxLayout(panel3, BoxLayout.X_AXIS)); // 기본 가로패널
+  JLabel _ing = new JLabel("현재 진행판");  text3_ = new JTextArea("\n",15,60); //세로 5줄, 가로 40자  text3_.append("\n");  JScrollPane _ingscroll = new JScrollPane(text3_); //스크롤 객체를 만들어 TextArea를넣기  panel3.add(_ing);  panel3.add(_ingscroll);
+
+  //       label0.setAlignmentX(Component.LEFT_ALIGNMENT);  //       text0.setAlignmentX(Component.LEFT_ALIGNMENT);  //      label1.setAlignmentX(Component.LEFT_ALIGNMENT);  //      text1.setAlignmentX(Component.LEFT_ALIGNMENT);  //      label2.setAlignmentX(Component.LEFT_ALIGNMENT);  //      text2.setAlignmentX(Component.LEFT_ALIGNMENT);  //      label3.setAlignmentX(Component.LEFT_ALIGNMENT);  //      text3.setAlignmentX(Component.LEFT_ALIGNMENT);  //      label4.setAlignmentX(Component.LEFT_ALIGNMENT);  //      text4.setAlignmentX(LEFT_ALIGNMENT); // Frame에서상속받았기때문에 Component 없어도됨  //      label5.setAlignmentX(Component.LEFT_ALIGNMENT);  //      text5.setAlignmentX(Component.LEFT_ALIGNMENT);  //      label6.setAlignmentX(Component.LEFT_ALIGNMENT);  //      text6.setAlignmentX(Component.LEFT_ALIGNMENT);  //        //      _ing.setAlignmentX(Component.LEFT_ALIGNMENT);  //      text3_.setAlignmentX(Component.LEFT_ALIGNMENT);  //      _ingscroll.setAlignmentX(LEFT_ALIGNMENT);  //     
+  add(panel);  add(panel2);  add(panel3);  add(panel4);
+  setSize(760,720);  setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //윈도우 닫기 버튼의 동작 방식 지정
+  Button[6].addActionListener(new ActionListener() {
+   @Override
+   public void actionPerformed(ActionEvent e) {
+    sendMessage("start_game");
+   }  });
+  Button[7].addActionListener(new ActionListener() {   @Override   public void actionPerformed(ActionEvent e) {    sendMessage("Roll");   
+   }
+  });
+  Button[8].addActionListener(new ActionListener() {   @Override   public void actionPerformed(ActionEvent e) {    sendMessage("END");      }
+  });
+  Button[0].addActionListener(new ActionListener() {   @Override   public void actionPerformed(ActionEvent e) {    sendMessage("1");        }
+  });
+  Button[1].addActionListener(new ActionListener() {   @Override   public void actionPerformed(ActionEvent e) {    sendMessage("2");          }
+  });
+  Button[2].addActionListener(new ActionListener() {   @Override   public void actionPerformed(ActionEvent e) {    sendMessage("3");         }
+  });
+  Button[3].addActionListener(new ActionListener() {   @Override   public void actionPerformed(ActionEvent e) {    sendMessage("4");         }
+  });
+  Button[4].addActionListener(new ActionListener() {   @Override   public void actionPerformed(ActionEvent e) {    sendMessage("5");          }
+  });
+  Button[5].addActionListener(new ActionListener() {   @Override   public void actionPerformed(ActionEvent e) {    sendMessage("6");          }
+  });
+  text0.addKeyListener(new KeyListener() {   public void keyPressed(KeyEvent e) {    if(e.getKeyChar() == '\n') {     sendMessage(text0.getText()+" /normal");     text3_.setText(text0.getText()+"님 입장완료 !");     text3_.append( "\n");     btnAct(6);    }   }
+   public void keyReleased(KeyEvent e) {}   public void keyTyped(KeyEvent e) {}  });
+  setVisible(true); // 이제 사람들에게 보이도록하기
+ }
+ void sendMessage(String str){  sender.println(str);  sender.flush();  System.out.println("log1: sent" + str);  text3_.setText( str + "\n"); }
+ void connectToServer(String serverIP, int port){  Socket socket;  try {   // 소켓을준비 (IP주소, Port번호)   // 서버에바로연결시도   socket = new Socket( serverIP, port );   // Scanner 준비 (사용자키보드입력)   console = new Scanner( System.in );   // 소켓으로부터스트림을받아옴
+   // receiver, sender
+   receiver = new Scanner(     new InputStreamReader(       socket.getInputStream(), "utf-8" ) );   sender = new PrintWriter(     new OutputStreamWriter(       socket.getOutputStream(), "utf-8" ) );    } catch (IOException e) {   e.printStackTrace();
+  }  // Receive 쓰레드생성  // 이쓰레드는항상받은메시지를출력만하는역할  new Thread() {
+   @Override   public void run() {    while( true ) {//     try {      line = receiver.nextLine();      text3_.append( line + "\n");      if( line == null ) {
+//       throw new Exception();
+      }      firstparsing(line);              BtnActivation(command, line);               //버튼제어      System.out.println( "받음: " + line );
+//     }                                                             //server&round_start&정진서,조지현,설순욱,김지우//     // &10000,40000@20000,30000@70000@10000,50000...////     catch( Exception ex ) {//      System.out.println( "Receive 쓰레드종료됨" );//      receiver.close();//      return;//     }    }   }  }.start(); }
+ void firstparsing(String line){
+  tokens1 = line.split("&");         // server&round_start
+  command = tokens1[1]; //멤버 변수에 저장  text3_.append(tokens1[0]+"_");  text3_.append(command); //화면에 출력  text3_.append("\n");
+
+  // 명령어에 따른 구분 동작
+  switch(command){  case "round_start":      String[]tokens2 = tokens1[2].split(",");    // 박종진  ,[봇],[봇],[봇]   String[]tokens3 = tokens1[3].split("@");   // 80000@40000,40000@90000@60000@50000@20000,70000     String[]tokens4_1 = tokens3[0].split(",");   String[]tokens4_2= tokens3[1].split(",");   String[]tokens4_3 = tokens3[2].split(",");   String[]tokens4_4 = tokens3[3].split(",");   String[]tokens4_5 = tokens3[4].split(",");   String[]tokens4_6 = tokens3[5].split(",");      text0_1.append(tokens2[1]);   text0_2.append(tokens2[2]);   text0_3.append(tokens2[3]);         text3_.append("1번  " +tokens2[0] +"님 입장완료");                  text3_.append("\n");   text3_.append("2번  " +tokens2[1] +"님 입장완료");   text3_.append("\n");   text3_.append("3번  " +tokens2[2] +"님 입장완료");   text3_.append("\n");   text3_.append("4번  " +tokens2[3] +"님 입장완료");   text3_.append("\n");
+   for(int i=0;i<tokens4_1.length;i++){    text1.append(tokens4_1[i]);    text1.append("\n");              }   for(int i=0;i<tokens4_2.length;i++){    text2.append(tokens4_2[i]);    text2.append("\n");              }   for(int i=0;i<tokens4_3.length;i++){    text3.append(tokens4_3[i]);    text3.append("\n");              }   for(int i=0;i<tokens4_4.length;i++){    text4.append(tokens4_4[i]);    text4.append("\n");              }   for(int i=0;i<tokens4_5.length;i++){    text5.append(tokens4_5[i]);    text5.append("\n");              }   for(int i=0;i<tokens4_6.length;i++){    text6.append(tokens4_6[i]);    text6.append("\n");              }   text1.append("\n\n\n");   text2.append("\n\n\n");   text3.append("\n\n\n");   text4.append("\n\n\n");   text5.append("\n\n\n");   text6.append("\n\n\n");break;
+  case "turn":      String[] turntoken = line.split("&");           // server&turn&정진서        if(turntoken[2].equals(text0.getText().trim())) {    Container contentPane = getContentPane();  // 콘테이너 색    contentPane.setBackground(Color.YELLOW);
+   }   else if(turntoken[2].equals(text0_1.getText().trim())){    Container contentPane = getContentPane();  // 콘테이너 색    contentPane.setBackground(Color.BLUE);   }   else if(turntoken[2].equals(text0_2.getText().trim())){    Container contentPane = getContentPane();  // 콘테이너 색    contentPane.setBackground(Color.GREEN);   }   else if(turntoken[2].equals(text0_3.getText().trim())){    Container contentPane = getContentPane();  // 콘테이너 색    contentPane.setBackground(Color.RED);   }   else{    Container contentPane = getContentPane();  // 콘테이너 색    contentPane.setBackground(Color.CYAN);   }   break;
+  case "roll":                                        break;  case "roll_result":                  //  server&roll_result&qkr@6,1,6,2,3,2,1,5        String[] roll_resulttoken = line.split("&");   String[] roll_resulttoken2 = roll_resulttoken[2].split("@");   String[] roll_resulttoken3 = roll_resulttoken2[1].split(",");      for(int i=0; i<roll_resulttoken3.length; i++){    dicenum[ Integer.valueOf(roll_resulttoken3[i])-1]++;   }
+   break;  case "bat":   String[] battoken = line.split("&");  // Matrix&bat&1   betting(Integer.valueOf(battoken[2]));   dicenum[0] = 0; dicenum[1] = 0; dicenum[2] = 0; dicenum[3] = 0; dicenum[4] = 0; dicenum[5] = 0;             // 주사위개수 초기화       break;  case "round_result":   break;  }
+   }
+ void startGame(){
+  // 메인쓰레드는이곳으로와서
+  // 사용자입력을받아서서버로전송하는역할을함
+  while( true ) {
+   System.out.print( "키보드입력: " );   String cmd = console.nextLine();   if( cmd.equals( "exit" ) ) {    System.out.println( "앱을종료하는중..." );    break;   }
+   System.out.println( "보냄: " + cmd );   sender.println( cmd );   sender.flush();
+  }
+ }
+ static String getIP() {     // 자동으로 Ip 할당받기.  try {   InetAddress ip = InetAddress.getLocalHost();   return ip.getHostAddress();  }  catch (Exception e) {}   return null; } 
+
+ void btnAct(int i) {//i번 버튼활성화    Button[i].setEnabled(true); } void btnDeAct(int i) {//i번 버튼비활성화  Button[i].setEnabled(false); }
+ void BtnActivation(String command, String line) {  switch(command) {  case "round_start" :   btnAct(8);   for(int i=0; i<9; i++) {    btnDeAct(i);   }   break;  case "turn" :   String[] turntoken = line.split("&");           // server&turn&정진서//   String[] turntoken2 = tokens1[3].split(",");      if(turntoken[2].equals(text0.getText().trim())) {    btnAct(7);   }   else {       for(int i=0; i<9; i++) {     btnDeAct(i);    }   }   break;  case "roll" :   btnDeAct(1);   break;  case "roll_result" :   for(int i=0; i<6; i++) {    if(dicenum[i] != 0) {     btnAct(i);    }    btnDeAct(7);   }   break;  case "bat" :       for(int i=0; i<6; i++) {    btnDeAct(i);   }   break;  case "round_result" :   break;  case "game_finish" :   break;  } }
+ void betting(int i){  String[] bettoken = line.split("&");  // Matrix&bat&1
+  switch(i) {
+  case 1:                   final_dicenum[0] = dicenum[0];   text1.append(bettoken[0]+"--"+final_dicenum[0]+"억");    text1.append("\n");     break;
+  case 2:                  final_dicenum[1] = dicenum[1];   text2.append(bettoken[0]+"--"+final_dicenum[1]+"억");   text2.append("\n");   break;  case 3:        final_dicenum[2] = dicenum[2];   text3.append(bettoken[0]+"--"+final_dicenum[2]+"억");   text3.append("\n");   break;  case 4:               final_dicenum[3] = dicenum[3];   text4.append(bettoken[0]+"--"+final_dicenum[3]+"억");   text4.append("\n");   break;  case 5:                   final_dicenum[4] = dicenum[4];   text5.append(bettoken[0]+"--"+final_dicenum[4]+"억");   text5.append("\n");   break;  case 6:                  final_dicenum[5] = dicenum[5];   text6.append(bettoken[0]+"--"+final_dicenum[5]+"억");   text6.append("\n");   break;  }
+ }
+  //      JPanel p = new JPanel();      // 여러 개의 메뉴 버튼을 하나의 서브판넬(buttons)에 묶기 //      p.setLayout(new FlowLayout(FlowLayout.LEFT)); //일방향으로 여러 개 배치하는레이아웃 //      panel.add(p); // 서브판넬을 진짜 판넬로 옮겨 붙인다. //       add(panel);  // 판넬을 콘테이너에 붙임. //       pack(); //      setSize(700,700); //      setVisible(true);
+ public static void main( String[] args ) {
+  Start_2 frame = new Start_2(getIP(), 33333);
+ }
+}
